@@ -18,6 +18,7 @@
 from typing import Tuple, Optional
 import warnings
 
+import os
 import torch
 
 from apex.transformer.log_util import get_transformer_logger
