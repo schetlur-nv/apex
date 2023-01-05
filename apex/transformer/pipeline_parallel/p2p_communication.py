@@ -19,6 +19,7 @@ import operator
 from typing import Union, Optional, Tuple
 
 import torch
+import os
 
 from apex.transformer import parallel_state
 from apex.transformer.log_util import get_transformer_logger
@@ -58,6 +59,8 @@ def _run_p2pops(
 
     need_to_sync = p2p_group.name() != default_group.name()
 
+    os.environ["NCCL_IB_DISABLE"] = "1"
+
     if tensor_send_prev is not None:
         send_prev_op = torch.distributed.P2POp(
             op=torch.distributed.isend,
@@ -90,6 +93,9 @@ def _run_p2pops(
             group=p2p_group,
         )
         ops.append(recv_next_op)
+
+    os.environ["NCCL_IB_DISABLE"] = "0"
+
     if len(ops) > 0:
         if need_to_sync:
             torch.cuda.synchronize()
