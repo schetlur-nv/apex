@@ -246,7 +246,6 @@ def initialize_model_parallel(
            _DECODER_RELATIVE_POSITION_EMBEDDING_GROUP is None, \
         'relative position embedding group is already initialized'
     for i in range(num_pipeline_model_parallel_groups):
-        os.environ["NCCL_IB_DISABLE"] = "1"
         ranks = range(i, world_size, num_pipeline_model_parallel_groups)
         group = torch.distributed.new_group(ranks, backend=p2p_backend)
         if rank in ranks:
@@ -286,7 +285,6 @@ def initialize_model_parallel(
             encoder_relative_position_embedding_ranks = ranks
             decoder_relative_position_embedding_ranks = ranks
 
-        os.environ["NCCL_IB_DISABLE"] = "0"
         group = torch.distributed.new_group(embedding_ranks, backend=default_backend)
         if rank in embedding_ranks:
             _EMBEDDING_GROUP = group

@@ -59,7 +59,7 @@ def _run_p2pops(
 
     need_to_sync = p2p_group.name() != default_group.name()
 
-    os.environ["NCCL_IB_DISABLE"] = "1"
+    os.environ["NCCL_NET"] = "Socket"
 
     if tensor_send_prev is not None:
         send_prev_op = torch.distributed.P2POp(
@@ -94,7 +94,7 @@ def _run_p2pops(
         )
         ops.append(recv_next_op)
 
-    os.environ["NCCL_IB_DISABLE"] = "0"
+    os.unsetenv("NCCL_NET")
 
     if len(ops) > 0:
         if need_to_sync:
