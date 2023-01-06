@@ -87,7 +87,7 @@ def initialize_model_parallel(
     pipeline_model_parallel_split_rank_: Optional[int] = None,
     *,
     default_backend: Optional[str] = "nccl",
-    p2p_backend: Optional[str] = "nccl",
+    p2p_backend: Optional[str] = "ucc",
 ) -> None:
     """
     Initialize model data parallel groups.
