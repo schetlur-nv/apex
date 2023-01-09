@@ -246,7 +246,7 @@ def initialize_model_parallel(
     assert _ENCODER_RELATIVE_POSITION_EMBEDDING_GROUP is None or \
            _DECODER_RELATIVE_POSITION_EMBEDDING_GROUP is None, \
         'relative position embedding group is already initialized'
-    print("Sharan: Initializing PP group with backend"+p2p_backend) 
+    print("Sharan: Initializing PP and embedding groups with backend "+p2p_backend) 
     for i in range(num_pipeline_model_parallel_groups):
         ranks = range(i, world_size, num_pipeline_model_parallel_groups)
         group = torch.distributed.new_group(ranks, backend=p2p_backend)
@@ -293,14 +293,14 @@ def initialize_model_parallel(
         if rank in ranks:
             _EMBEDDING_GLOBAL_RANKS = embedding_ranks
 
-        group = torch.distributed.new_group(position_embedding_ranks, backend=default_backend)
+        group = torch.distributed.new_group(position_embedding_ranks, backend=p2p_backend)
         if rank in position_embedding_ranks:
             _POSITION_EMBEDDING_GROUP = group
         if rank in ranks:
             _POSITION_EMBEDDING_GLOBAL_RANKS = position_embedding_ranks
 
         if encoder_relative_position_embedding_ranks:
-            group = torch.distributed.new_group(encoder_relative_position_embedding_ranks)
+            group = torch.distributed.new_group(encoder_relative_position_embedding_ranks, backend=p2p_backend)
         if rank in encoder_relative_position_embedding_ranks:
             _ENCODER_RELATIVE_POSITION_EMBEDDING_GROUP = group
         if rank in ranks:
@@ -308,7 +308,7 @@ def initialize_model_parallel(
                 encoder_relative_position_embedding_ranks
 
         if decoder_relative_position_embedding_ranks:
-            group = torch.distributed.new_group(decoder_relative_position_embedding_ranks)
+            group = torch.distributed.new_group(decoder_relative_position_embedding_ranks, backend=p2p_backend)
         if rank in decoder_relative_position_embedding_ranks:
             _DECODER_RELATIVE_POSITION_EMBEDDING_GROUP = group
         if rank in ranks:
