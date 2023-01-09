@@ -287,7 +287,7 @@ def initialize_model_parallel(
             encoder_relative_position_embedding_ranks = ranks
             decoder_relative_position_embedding_ranks = ranks
 
-        group = torch.distributed.new_group(embedding_ranks, backend=default_backend)
+        group = torch.distributed.new_group(embedding_ranks, backend=p2p_backend)
         if rank in embedding_ranks:
             _EMBEDDING_GROUP = group
         if rank in ranks:
